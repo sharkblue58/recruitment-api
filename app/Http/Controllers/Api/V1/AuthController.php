@@ -4,28 +4,49 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\User;
 use App\Mail\OtpMail;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Mail\WelcomeMail;
+use App\Models\Candidate;
+use App\Models\Recruiter;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Requests\V1\RegisterRequest;
+
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+        $user = DB::transaction(function () use ($request) {
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => $request->password,
+                'phone' => $request->phone,
+                'is_term_accepted' => $request->is_term_accepted,
+                'field_id' => $request->field_id
+            ]);
 
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => $request->password,
-        ]);
+            if ($request->role == 'candidate') {
+                Candidate::create([
+                    'user_id' => $user->id
+                ]);
+                $user->assignRole('candidate');
+            } else if ($request->role == 'recruiter') {
+                Recruiter::create([
+                    'user_id' => $user->id,
+                    'company_name' => $request->company_name,
+                    'job_title' => $request->job_title
+                ]);
+                $user->assignRole('recruiter');
+            }
+            return $user;
+        });
+
 
         $otp = rand(100000, 999999);
         Cache::put("otp_{$user->email}", $otp, now()->addMinutes(5));

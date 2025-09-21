@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SocialEmail extends Model
+class Recruiter extends Model
 {
     protected $fillable = [
         'user_id',
-        'provider',
-        'provider_id',
-        'avatar',
+        'company_name',
+        'job_title',
     ];
 
     public function user()

@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Field;
+use App\Models\Candidate;
+use App\Models\Recruiter;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -12,7 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens , HasRoles;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -20,9 +23,13 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
+        'phone',
+        'is_term_accepted',
+        'field_id',
     ];
 
     /**
@@ -46,5 +53,25 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function socialEmails()
+    {
+        return $this->hasMany(SocialEmail::class);
+    }
+
+    function field()
+    {
+        return $this->belongsTo(Field::class);
+    }
+
+    public function candidate()
+    {
+        return $this->hasOne(Candidate::class);
+    }
+
+    public function recruiter()
+    {
+        return $this->hasOne(Recruiter::class);
     }
 }

@@ -5,6 +5,9 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\CitiesTableSeeder;
+use Database\Seeders\CountriesTableSeeder;
+use Database\Seeders\RolePermissionSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,7 +19,9 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
          $this->call([
-             RolePermissionSeeder::class 
+             RolePermissionSeeder::class, 
+             CountriesTableSeeder::class,
+             CitiesTableSeeder::class
          ]);
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\User;
+use App\Models\Candidate;
+use App\Models\Recruiter;
 use App\Models\Invitation;
 use Illuminate\Support\Str;
 use App\Mail\InvitationMail;
@@ -10,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\V1\RegisterRequest;
 
 
 class InvitationLinkController extends Controller
@@ -30,13 +33,13 @@ class InvitationLinkController extends Controller
 
         $link = url('/register/invite/' . $token);
 
-        
-         Mail::to($request->email)->queue(new InvitationMail($link));
+
+        Mail::to($request->email)->queue(new InvitationMail($link));
 
         return response()->json(['message' => 'Invitation sent', 'link' => $link]);
     }
 
-    public function registerWithInvitation(Request $request, $token)
+    public function registerWithInvitation(RegisterRequest $request, $token)
     {
         $invitation = Invitation::where('token', $token)
             ->where('is_used', false)
@@ -47,24 +50,36 @@ class InvitationLinkController extends Controller
             return response()->json(['message' => 'Invalid or expired invitation'], 400);
         }
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $user = DB::transaction(function () use ($invitation, $request) {
+        $user = DB::transaction(function () use ($request, $invitation) {
             $user = User::create([
-                'name' => $request->name,
-                'email' => $invitation->email,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
                 'password' => $request->password,
+                'phone' => $request->phone,
+                'is_term_accepted' => $request->is_term_accepted,
+                'field_id' => $request->field_id,
                 'email_verified_at' => now(),
             ]);
 
+
+            if ($request->role == 'candidate') {
+                Candidate::create([
+                    'user_id' => $user->id
+                ]);
+                $user->assignRole('candidate');
+            } else if ($request->role == 'recruiter') {
+                Recruiter::create([
+                    'user_id' => $user->id,
+                    'company_name' => $request->company_name,
+                    'job_title' => $request->job_title
+                ]);
+                $user->assignRole('recruiter');
+            }
             $invitation->update(['is_used' => true]);
 
             return $user;
         });
-
 
         return response()->json(['message' => 'Registered successfully', 'user' => $user]);
     }
