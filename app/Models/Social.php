@@ -5,14 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Recruiter extends Model
+class Social extends Model
 {
     protected $fillable = [
         'user_id',
-        'company_name',
-        'job_title',
+        'provider',
+        'provider_id',
+        'avatar'
     ];
 
+    /**
+     * Get the user that owns the social account.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

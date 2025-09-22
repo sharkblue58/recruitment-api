@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Models\Field;
 use App\Models\Candidate;
 use App\Models\Recruiter;
+use App\Models\Social;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -58,6 +59,11 @@ class User extends Authenticatable
     public function socialEmails()
     {
         return $this->hasMany(SocialEmail::class);
+    }
+
+    public function socials()
+    {
+        return $this->hasMany(Social::class);
     }
 
     function field()

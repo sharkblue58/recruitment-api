@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_term_accepted')->default(true);
-            $table->foreignId('field_id')->constrained('fields');
+            $table->foreignId('field_id')->nullable()->constrained('fields')->nullOnDelete();
             $table->rememberToken();
             $table->timestamps();
         });
