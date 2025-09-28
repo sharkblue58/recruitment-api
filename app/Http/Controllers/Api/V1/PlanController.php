@@ -6,6 +6,7 @@ use App\Models\Plan;
 use Illuminate\Http\Request;
 use App\Services\StripeService;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
 class PlanController extends Controller
@@ -67,6 +68,16 @@ class PlanController extends Controller
 
     public function destroy(Plan $plan, StripeService $stripe)
     {
+        $subscriptions = $stripe->client->subscriptions->all([
+            'price' => $plan->stripe_price_id,
+            'status' => 'active',
+        ]);
+
+        if (count($subscriptions->data) > 0) {
+            return response()->json([
+                'message' => 'Plan has active subscribers on Stripe.'
+            ], 400);
+        }
         // mark inactive locally; optionally archive product on Stripe
         $plan->update(['active' => false]);
         // you might also set stripe product active=false

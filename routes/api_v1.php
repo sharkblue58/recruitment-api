@@ -44,9 +44,8 @@ Route::group([],function () {
 });
 
 
-Route::group([],function () {
-    Route::post('/subscriptions', [SubscriptionController::class, 'store']); // subscribe to plan
-    Route::get('/subscriptions', [SubscriptionController::class, 'index']);  // list user subscriptions
+Route::group(["middleware" => "auth:api"],function () {
+    Route::post('/subscriptions/subscribe', [SubscriptionController::class, 'subscribe']); // subscribe to plan
     Route::delete('/subscriptions/{subscription}', [SubscriptionController::class, 'cancel']); // cancel subscription
 
     // Refund Requests

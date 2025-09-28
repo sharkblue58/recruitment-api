@@ -2,56 +2,41 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use Stripe\Webhook;
 use Illuminate\Http\Request;
-use App\Models\RefundRequest;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Stripe\Exception\SignatureVerificationException;
 
 class StripeWebhookController extends Controller
 {
     public function handle(Request $request)
     {
-        // Use Cashier's webhook controller to handle billing events first
+      
         $payload = $request->getContent();
-        $sigHeader = $request->header('Stripe-Signature');
-        $endpointSecret = config('cashier.webhook.secret'); // set in env
+        //logger("This is payload: ".$payload);
+        $sigHeader = $request->header('stripe-signature');
+        //logger("This is sigHeader: ".$sigHeader);
+        $secret = config('services.stripe.webhook_secret'); // من stripe dashboard
+        //logger("This is secret: ".$secret);
+
 
         try {
-            $event = \Stripe\Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
-        } catch (\UnexpectedValueException $e) {
-            return response()->json(['error' => 'Invalid payload'], 400);
-        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            $event = Webhook::constructEvent($payload, $sigHeader, $secret);
+        } catch (SignatureVerificationException $e) {
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
-        // handle events you care about
         switch ($event->type) {
             case 'invoice.payment_succeeded':
-                $invoice = $event->data->object;
-                logger($event->type);
-                // update subscription/payment status in DB
-                // you can find user by invoice.customer
-                // Cashier handles invoice and subscriptions automatically if you use Cashier WebhookController
+                // هنا تحفظ ان الاشتراك اتدفع بنجاح
                 break;
 
-            case 'customer.subscription.updated':
-            case 'customer.subscription.created':
             case 'customer.subscription.deleted':
-                // update local subscription metadata/status if needed
-                break;
-
-            case 'charge.refunded':
-                $charge = $event->data->object;
-                // find refundRequests by charge id and update status to refunded if present
-                RefundRequest::where('stripe_charge_id', $charge->id)->update(['status' => 'refunded']);
-                break;
-
-            // handle price/product deleted/updated events to keep your Plan table synced
-            case 'product.updated':
-            case 'price.updated':
-                // optional: sync changes
+                // هنا تلغي الاشتراك عندك
                 break;
         }
 
-        return response()->json(['received' => true]);
+        return response()->json(['status' => 'success']);
     }
 }
