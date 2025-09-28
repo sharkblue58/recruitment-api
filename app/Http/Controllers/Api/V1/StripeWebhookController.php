@@ -27,6 +27,7 @@ class StripeWebhookController extends Controller
         switch ($event->type) {
             case 'invoice.payment_succeeded':
                 $invoice = $event->data->object;
+                logger($event->type);
                 // update subscription/payment status in DB
                 // you can find user by invoice.customer
                 // Cashier handles invoice and subscriptions automatically if you use Cashier WebhookController
