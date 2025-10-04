@@ -15,6 +15,7 @@ use Database\Seeders\SkillSeeder;
 use Database\Seeders\ProfessionSeeder;
 use Database\Seeders\EducationSeeder;
 use Database\Seeders\SocialSeeder;
+use Database\Seeders\UserGuideSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -52,6 +53,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->command->info('Skills and related data seeded.');
+
+        // User guides data
+        $this->call([
+            UserGuideSeeder::class,
+        ]);
+
+        $this->command->info('User guides data seeded.');
         $this->command->info('Database seeding completed successfully!');
     }
 }
