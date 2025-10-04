@@ -32,6 +32,7 @@ class User extends Authenticatable
         'phone',
         'is_term_accepted',
         'field_id',
+        'city_id',
     ];
 
     /**
@@ -80,5 +81,10 @@ class User extends Authenticatable
     public function recruiter()
     {
         return $this->hasOne(Recruiter::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
     }
 }

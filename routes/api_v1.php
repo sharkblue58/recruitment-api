@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\v1\SubscriptionController;
 use App\Http\Controllers\Api\V1\PasswordResetController;
 use App\Http\Controllers\Api\v1\StripeWebhookController;
 use App\Http\Controllers\Api\V1\InvitationLinkController;
+use App\Http\Controllers\ProfileController;
 
 
 Route::group(['prefix' => 'auth'], function () {
@@ -24,10 +25,23 @@ Route::group(['prefix' => 'auth'], function () {
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
 Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 
+// Public routes for profile data
+Route::get('/fields', [ProfileController::class, 'getFields']); // Get available fields
+Route::get('/cities', [ProfileController::class, 'getCities']); // Get available cities
+Route::post('/fields', [ProfileController::class, 'createField']); // Create new field
+
 Route::group([
     'middleware' => 'auth:api',
 ], function () {
     Route::get('/send-invitation', [InvitationLinkController::class, 'sendInvitation'])->middleware('permission:send.invite');
+    
+    // Profile Management Routes
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']); // Get user profile
+        Route::put('/', [ProfileController::class, 'update']); // Update user profile
+        Route::put('/password', [ProfileController::class, 'updatePassword']); // Update password
+        Route::put('/recruiter', [ProfileController::class, 'updateRecruiterProfile']); // Update recruiter profile
+    });
 });
 
 
