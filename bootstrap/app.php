@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\FeatureMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Auth\AuthenticationException;
@@ -20,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->alias([
+            'feature' => FeatureMiddleware::class
+        ]);
         //
     })->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
