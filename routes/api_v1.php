@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\PasswordResetController;
 use App\Http\Controllers\Api\v1\StripeWebhookController;
 use App\Http\Controllers\Api\V1\InvitationLinkController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserGuideController;
 
 
 Route::group(['prefix' => 'auth'], function () {
@@ -72,4 +73,14 @@ Route::group([],function () {
     Route::get('/admin/refund-requests', [RefundController::class, 'adminIndex']); // list all
     Route::put('/admin/refund-requests/{id}/approve', [RefundController::class, 'approve']); 
     Route::put('/admin/refund-requests/{id}/reject', [RefundController::class, 'reject']);  
+});
+
+// User Guides Routes
+Route::group(['prefix' => 'user-guides'], function () {
+    Route::get('/', [UserGuideController::class, 'index']); // Get all user guides with filters
+    Route::get('/{audience}/{contentType}', [UserGuideController::class, 'getByAudienceAndType']); // Get guides by audience and type
+    Route::get('/{userGuide}', [UserGuideController::class, 'show']); // Get single user guide
+    Route::post('/', [UserGuideController::class, 'store']); // Create user guide
+    Route::put('/{userGuide}', [UserGuideController::class, 'update']); // Update user guide
+    Route::delete('/{userGuide}', [UserGuideController::class, 'destroy']); // Delete user guide
 });
