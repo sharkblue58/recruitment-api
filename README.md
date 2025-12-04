@@ -4,6 +4,7 @@
 ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Filament](https://img.shields.io/badge/Filament-3B82F6?style=for-the-badge&logo=laravel&logoColor=white)
 
 A recruitment management application built with Laravel that helps businesses streamline their hiring process, manage candidates, and track job applications efficiently.
 
